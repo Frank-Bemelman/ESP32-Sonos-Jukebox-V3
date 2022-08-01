@@ -1,4 +1,4 @@
-![This is an image](images/IMG_1366.JPG)
+![This is an image](SD-Card-Content/artweb/jukebox.JPG)
 
 **ESP32-Sonos-Jukebox**
 
