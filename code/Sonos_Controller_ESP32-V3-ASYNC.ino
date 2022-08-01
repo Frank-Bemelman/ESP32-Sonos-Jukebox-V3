@@ -366,19 +366,12 @@ String listFiles(bool ishtml = false);
 
 #include <DNSServer.h>
 
-#define SERIAL_DATA_THRESHOLD_MS 500
-#define SERIAL_ERROR_TIMEOUT "E: Serial"
-#define ETHERNET_ERROR_DHCP "E: DHCP"
-#define ETHERNET_ERROR_CONNECT "E: Connect"
-
-void handleSerialRead();
-
 // why not
 void setupMQTT(void);
 void loopMQTT(void);
 
 // friendly names of various Sonos services
-extern const char *p_MediaSourceName[];
+//extern const char *p_MediaSourceName[];
 
 const int JUKEKEYMODE[SONOS_MAXSOURCE]={
 SELECTRADIO, //UNKNOWN_SCHEME,
