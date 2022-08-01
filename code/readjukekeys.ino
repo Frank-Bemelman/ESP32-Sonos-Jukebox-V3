@@ -121,6 +121,14 @@ void ReadJukeKeys(void * pvParameters)
     }
     else encoder_button_changed = 0;
 
+    if(deb_encoder_button)
+    { encoder_button_very_long_pressed++; // use that to activate portal wifi manager
+    }
+    else
+    { encoder_button_very_long_pressed = 0;
+    }
+
+
     
     // debounce blue
     if(act_blue_button != deb_blue_button)
@@ -186,15 +194,13 @@ void ReadJukeKeys(void * pvParameters)
 
     if(deb_cancel_button)
     { if(CancelButtonEnabled)cancel_button_long_pressed++;
-      cancel_button_very_long_pressed++; // might use that to activate portal wifi manager
+      cancel_button_very_long_pressed++; 
     }
     else
     { cancel_button_long_pressed = 0;   
       CancelButtonEnabled = 1;
       cancel_button_very_long_pressed = 0;
     }
-
-
 
     if(!MagnetDeadTime10mS)
     { if(left_keyf == deb_left_key)

@@ -295,6 +295,7 @@ int control_keyf = 0;
 
 volatile byte cancel_button_long_pressed = 0;
 int cancel_button_very_long_pressed = 0;
+int encoder_button_very_long_pressed = 0;
 int magnet = 0;
 int magnetdeadtime = 0;
 int selectedsong = 0;
@@ -931,10 +932,9 @@ int n;
           ACTIVE_sonosIP = G_SonosFound_IPList[SonosLastUsed];
           sprintf(ACTIVE_sonosHeaderHost, HEADER_HOST, ACTIVE_sonosIP[0], ACTIVE_sonosIP[1], ACTIVE_sonosIP[2], ACTIVE_sonosIP[3], UPNP_PORT); // 29 bytes max  
           TFT_line_print(1, G_SonosDeviceList[SonosLastUsed].Zonename);
-          TFT_line_print(2, "");
+          TFT_line_print(2, "MODE");
           TFT_line_print(3, "");
           TFT_line_print(4, "");
-
           TFT_line_print(5, "RETRIEVING SONOS MODUS OPERANDI");
           runAsyncClient(SONOSGETMODE);
           BootFase++;
@@ -942,7 +942,7 @@ int n;
           break;
 
         case 10:
-          TFT_line_print(4, "STATE");
+          TFT_line_print(3, "STATE");
           runAsyncClient(SONOSGETSTATE);
           BootFase++;
           UpdateTimeOut10mS = 200;
@@ -1064,19 +1064,22 @@ int n;
     shouldReboot = false;
   }
 
-//  if(cancel_button_very_long_pressed >= 1000) // 10 seconden
-//  { cancel_button_very_long_pressed = 0;
-//    server->end();
-//    WiFiManager wm;
-//    wm.resetSettings();
-//    wm.setConfigPortalTimeout(180);
-//    if(!wm.startConfigPortal("JukeSetup)"))
-//    { Serial.println("failed to connect JukeSetup and hit timeout");
-//      ESP.restart();
-//      delay(5000);
-//    }
-//    Serial.println("connected.... yeey :)");
-//  }
+  if(encoder_button_very_long_pressed >= 2000) // 10 seconden
+  { encoder_button_very_long_pressed = 0;
+    AllSet = false; // forces lcd to green color
+    server->end();
+    TFT_line_print(0, "WIFI SETUP");
+    TFT_line_print(1, "");
+    TFT_line_print(2, "");
+    TFT_line_print(3, "");
+    TFT_line_print(4, "");
+    TFT_line_print(5, "Use Your Smartphone And Connect To JUKEBOX-PORTAL For Your Wifi Setup");
+    bOpenPortal = true;
+    loop2();  
+    TFT_line_print(5, "Setup Done --- Will Reboot Now");
+    delay(2000);
+    ESP.restart();
+  }
 
 
   if(AllSet && SonosSkipRequest)
@@ -1299,25 +1302,11 @@ int n;
 
   if(encoder_buttonf == deb_encoder_button) // state change
   { encoder_buttonf = 1234;
-    if(deb_encoder_button==0)  // ingedrukt?
+    if(deb_encoder_button==0)  // pressed?
     { Serial.print("Volume Button -> skip");
       { if(DeviceMode == SELECTSONG)SonosSkipRequest = 1;
         else // radio mode
         { // place for a new idea 
-          AllSet = false; // forces lcd to green color
-          bOpenPortal = true;
-          server->end();
-          TFT_line_print(0, "WIFI SETUP");
-          TFT_line_print(1, "");
-          TFT_line_print(2, "");
-          TFT_line_print(3, "");
-          TFT_line_print(4, "");
-          TFT_line_print(5, "Use Your Smartphone And Connect To JUKEBOX-PORTAL For Your Wifi Setup");
-          bOpenPortal = true;
-          loop2();  
-          TFT_line_print(5, "Setup Done --- Will Reboot Now");
-          delay(2000);
-          ESP.restart();
         }
       }
     }
