@@ -29,7 +29,9 @@ For this, there are voltage diviver resistors mounted on the switches. This redu
  * It uses an SD card to store some artwork and music files, but as a music source a sonos playlist is recommended.
  * It has a webserver that can produce printable jukebox 1" by 3" strips to insert in the slots of your jukebox or wallbox
 
-It is a work in progress. It is quite a mess really and needs fixes in many places.
+To get yourself started, it is a good idea to connect a TFT display, an encoder knob and an SD card. Copy the content of the SD-CARD folder to the SD card. You can add your own music files. There is some information about that in the source files, how their names should be formattted.
+
+This is a work in progress. It is quite a mess really and needs fixes in many places.
 Provided as is.  
 
 Enjoy!
