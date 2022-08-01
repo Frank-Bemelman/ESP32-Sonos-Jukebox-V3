@@ -21,13 +21,13 @@ I would never got this far without it.
 
 **It uses an ESP32 Dev Kit module and has the following features:**
 
- * It reads the selection keys of the jukebox. Two rows of 10 keys are read by just 2 analog inputs.
+ * reads the selection keys of the jukebox. Two rows of 10 keys are read by just 2 analog inputs.
 For this, there are voltage diviver resistors mounted on the switches. This reduces the number of wires to the ESP32.
- * It uses a TFT display to give some feedback about the song playing, radio station, volume setting etc.
- * It uses a encoder knob to control the volume for the Sonos.
- * It uses pixelleds to illuminate the keys, just for fun.
- * It uses an SD card to store some artwork and music files, but as a music source a sonos playlist is recommended.
- * It has a webserver that can produce printable jukebox 1" by 3" strips to insert in the slots of your jukebox or wallbox
+ * uses a TFT display to give some feedback about the song playing, radio station, volume setting etc.
+ * uses a encoder knob to control the volume for the Sonos.
+ * uses neopixels leds to illuminate the keys, just for fun.
+ * uses an SD card to store some artwork and music files, but as a music source a sonos playlist is recommended.
+ * has a webserver that can produce printable jukebox 1" by 3" strips to insert in the slots of your jukebox or wallbox
 
 To get yourself started, it is a good idea to connect a TFT display, an encoder knob and an SD card. Copy all files from the SD-CARD-Content folder to your SD card. You can add your own music files. There is some information about that in the source files, how their names should be formattted.
 
