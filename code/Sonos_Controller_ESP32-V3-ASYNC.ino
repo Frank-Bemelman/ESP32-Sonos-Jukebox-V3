@@ -370,9 +370,6 @@ String listFiles(bool ishtml = false);
 void setupMQTT(void);
 void loopMQTT(void);
 
-// friendly names of various Sonos services
-//extern const char *p_MediaSourceName[];
-
 const int JUKEKEYMODE[SONOS_MAXSOURCE]={
 SELECTRADIO, //UNKNOWN_SCHEME,
 SELECTRADIO, //SPOTIFY_SCHEME,
