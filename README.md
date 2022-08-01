@@ -31,6 +31,8 @@ For this, there are voltage diviver resistors mounted on the switches. This redu
 
 To get yourself started, it is a good idea to connect a TFT display, an encoder knob and an SD card. Copy all files from the SD-CARD-Content folder to your SD card. You can add your own music files. There is some information about that in the source files, how their names should be formattted.
 
+The main file is Sonos_Controller_ESP32-V3-ASYNC.ino and also tells which I/O pins to use for the TFT display, encoder knob and SD card. In readjukkeys there are instructions how to wire the jukebox keys and also how you could add some volume up/down buttons on a wallbox. 
+
 This is a work in progress. It is quite a mess really and needs fixes in many places.
 Provided as is.  
 
