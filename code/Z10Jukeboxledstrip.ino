@@ -28,14 +28,14 @@ void AnimateLedstrip(void * pvParameters)
     else PotScanNewPos++;
     PotScanNewPos &= 0x0f;
      
-    ReturnAt = (DeviceMode == SELECTRADIO) ? 19 : 9; // 1 lange scan over beide banken of 2 korte scans op beide banken
+    ReturnAt = (DeviceMode == SELECTRADIO) ? 19 : 9; // 1 long scan over both banks of keys or two short scans over each
     if(DeviceMode != SELECTRADIO)KitScanNewPos %=10;
-    if(KitScannerDirection==0) // we lopen op
+    if(KitScannerDirection==0) // going up
     { if(KitScanNewPos<ReturnAt)
       { KitScanNewPos++; // 2-3-4-5-6-7-8-9
       }
       else 
-      { KitScannerDirection=1; // we gaan aflopen
+      { KitScannerDirection=1; // going back
         KitScanNewPos--; // 8
       }
     }
@@ -59,7 +59,7 @@ void AnimateLedstrip(void * pvParameters)
     { ColorPicked = 0xFF4000;
     }
     else // RADIO
-    { if(DeviceType == WALLBOX)ColorScan = 0xFF3004;  // wat lichter rood
+    { if(DeviceType == WALLBOX)ColorScan = 0xFF3004;  // lighter shade of red for wallbox
       ColorPicked = 0xFF4000;
     }
    
@@ -113,7 +113,7 @@ void AnimateLedstrip(void * pvParameters)
         // same for right row, keys 1-2-3-4-5-6-7-8-9-0
         if(deb_right_key<1)
         { KnobToLit = KitScanNewPos % 10;
-          if((DeviceMode == SELECTSONG) || ((DeviceMode == SELECTRADIO) && (deb_left_key==0))) // bij radio alleen kit-scannen als er aan de andere kant geen knop is ingedrukt
+          if((DeviceMode == SELECTSONG) || ((DeviceMode == SELECTRADIO) && (deb_left_key==0))) // in radio mode only scan if no button on the other row is pressed
           { if((DeviceMode == SELECTRADIO) && (KitScanNewPos==(NewRadioStation-11)))UseColorScan = 0xFFFFFF;
             if((DeviceMode != SELECTRADIO) || ((KitScanNewPos / 10)==1))
             { leds[KeyPosToLed[KnobToLit][1]-35] = ColorScan;
@@ -143,10 +143,10 @@ void AnimateLedstrip(void * pvParameters)
       { if(DeviceMode == SELECTRADIO)
         { // default alles op orange
           if(NewSonosSourceMode == SONOS_SOURCE_HTTP) // Sonos RADIO of Apple Music
-          { ColorScan = 0xFF6000;  // doe maar geel op de wallbox net als de TFT op de jukebox
+          { ColorScan = 0xFF6000;  // yellow for wallbox just like TFT background color
           }
-          else if(NewSonosSourceMode == SONOS_SOURCE_UNKNOWN) // bijv bij reclame of Spotify
-          { ColorScan = 0x00FF00;  // doe maar geel op de wallbox net als de TFT op de jukebox
+          else if(NewSonosSourceMode == SONOS_SOURCE_UNKNOWN) // can happen during commercials on radio
+          { ColorScan = 0x00FF00;  // yellow for wallbox just like TFT background color
           }
           for(int i=0; i<NUM_LEDS; i++)
           { leds[i] = ColorScan;

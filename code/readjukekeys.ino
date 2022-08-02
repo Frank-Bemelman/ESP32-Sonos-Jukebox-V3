@@ -1,5 +1,9 @@
 // functions to read and debounce keys
 // wallbox uses up/down buttons for volume control
+// also latches the electric magnet to latch keys, jukebox uses a magnet latch
+
+// the magnet latch (solenoid) on the Rockola is drive by 12 volts. I use a 12V power spupply for everything with a stepdown converter to 5V for the ESP32
+// the magnet works on 12V and is switched with a optocoupler fet driver. these can be found in the usual places.
 
 int AdcConvert(int value)
 { // converts an analog input value and return the key pressed
@@ -25,7 +29,7 @@ int AdcConvert(int value)
   //     NC CONTACTS  +----=----+----=----+----=----+----=----+----=----+----=----+----=----+----=----+----=----+----=----+
   //     KEY    ROW   |   10         9         8         7         6         5         4         3         2         1    | 
   //                  |                                                                                                   |
-  //                  +--------> to analog input pin                                                                      +--------> to GND
+  //                  +--------> to analog input pin ESP32 D36                                                            +--------> to GND
   //
 
   //
@@ -36,10 +40,11 @@ int AdcConvert(int value)
   //     NC CONTACTS  +----=----+----=----+----=----+----=----+----=----+----=----+----=----+----=----+----=----+----=----+
   //     KEY    ROW   |    K         J         H         G         F         E         D         C         B         A    | 
   //                  |                                                                                                   |
-  //                  +--------> to analog input pin                                                                      +--------> to GND
+  //                  +--------> to analog input pin ESP32 D39                                                            +--------> to GND
   //
 
-  // wallbox only - control of volume and skip/next (long press to switch between radio and jukebox)
+  // wallbox only - control of volume and skip/next
+  // skip/nect button has multiple functions - long press to switch between radio and jukebox, >20 seconds press to start webmanager portal.
   //                      
   //                    
   // +3V3 ----[560]---+         +--[4K7]--+--[2K2]--+                                                           +---[68]--+
@@ -47,10 +52,24 @@ int AdcConvert(int value)
   //     NC CONTACTS  +---------+----=----+----=----+-----------------------------------------------------------+----=----+
   //     KEY    ROW   |              V+       V-                                                                     S    | 
   //                  |                                                                                              K    |
-  //                  +--------> to analog input pin                                                                 I    +--------> to GND
+  //                  +--------> to analog input pin ESP32                                                           I    +--------> to GND
   //                                                                                                                 P
   //
-
+  //        +------------------+
+  // +12V --+                  +------> +5V ESP32
+  //        | Stepdown 12V-5V  |
+  // GND ---+                  +------> GND ESP32
+  //        +------------------+
+  //
+  //        +--------------+         +----------------+
+  // +12V --+   solenoid   +---------+                +----------> ESP32 D21 SOLENOID
+  //        +--------------+         +   FET DRIVER   +
+  //                             +---+                +---+
+  //                             |   +----------------+   |
+  //                             |                        |
+  //                             +------------------------+------> GND 
+  //
+  //
 
 
     
