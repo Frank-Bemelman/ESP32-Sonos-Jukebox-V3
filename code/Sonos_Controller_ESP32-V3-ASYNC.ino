@@ -1,8 +1,9 @@
 // Controller for Sonos soundsystems by frank
 // provided as is
-// work in progress
+// work in progres
+// boardmanager -> ESP32 Dev Module
 
-// a mix of all sorts of libraries found on github
+// a mix of all sorts of libraries found on github is used
 
 // feature list 
 // wifi setup manager to enter your wifi ssid and password
@@ -1059,7 +1060,10 @@ int n;
   loopMQTT();
   
   if (shouldReboot)
-  { //rebootESP("Web Admin Initiated Reboot");
+  { TFT_line_print(0, "WEB BOOT");
+    TFT_line_print(5, "Will Reboot In 5 Seconds");
+    delay(6000);
+    rebootESP("Web Admin Initiated Reboot");
     Serial.println("shouldReboot????????????");
     shouldReboot = false;
   }

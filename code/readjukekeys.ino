@@ -326,7 +326,8 @@ void ReadJukeKeys(void * pvParameters)
               { //Serial.print("Volume-down ");
                 //Serial.println(ActualVolumeFromSonos);
                 NewVolumeForSonos = ActualVolumeFromSonos -5;
-                if(NewVolumeForSonos<10)NewVolumeForSonos=10;
+                NewVolumeForSonos = rotary_loop(NewVolumeForSonos); 
+                AsyncVolumeForSonos = NewVolumeForSonos;
               }  
             }    
             else if(deb_control_key==9) // volume up
@@ -334,7 +335,8 @@ void ReadJukeKeys(void * pvParameters)
               { //Serial.print("Volume-up ");
                 //Serial.println(ActualVolumeFromSonos);
                 NewVolumeForSonos = ActualVolumeFromSonos +5;
-                if(NewVolumeForSonos>90)NewVolumeForSonos=90;
+                NewVolumeForSonos = rotary_loop(NewVolumeForSonos); 
+                AsyncVolumeForSonos = NewVolumeForSonos;
               }
             }
           }
