@@ -249,8 +249,8 @@ bool UpdateVinylRecord(int NewShow45RPM10mS)
       if (Current45RPMShown != Actual45RPMShown)
       { Current45RPMShown = Actual45RPMShown;
         strcpy(text, "Selection [ - ]");
-        if (deb_left_key)text[10] = KnobDecals[deb_left_key - 1];
-        if (deb_right_key)text[12] = KnobDecals[deb_right_key + 9];
+        if (deb_left_key)text[11] = KnobDecals[deb_left_key - 1];
+        if (deb_right_key)text[13] = KnobDecals[deb_right_key + 9];
         TFT_line_print(5, text);
         tw = MyDisplay[5].pixelwidth;
         tft.fillRoundRect(  ((240 - tw) / 2) - 15   , (5*40)+2, tw + 30, 32, 16, BackGroundColor); 
