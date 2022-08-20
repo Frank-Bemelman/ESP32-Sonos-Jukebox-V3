@@ -18,6 +18,7 @@ I would never got this far without it.
  * ESP_WiFiManager by Khoih for setting up wifi credentials
  * Fastled library to drive the pixelled stuff
  * Arduino OTA to upload code over Wifi rather than USB cable
+ * Parola for the led matrix display
 
 **It uses an ESP32 Dev Kit module and has the following features:**
 
