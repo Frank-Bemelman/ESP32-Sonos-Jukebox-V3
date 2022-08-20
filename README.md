@@ -28,6 +28,7 @@ For this, there are voltage diviver resistors mounted on the switches. This redu
  * uses neopixels leds to illuminate the keys, just for fun.
  * uses an SD card to store some artwork and music files, but as a music source a sonos playlist is recommended.
  * has a webserver that can produce printable jukebox 1" by 3" strips to insert in the slots of your jukebox or wallbox
+ * led matrix to display song title or radio content information
 
 To get yourself started, it is a good idea to connect a TFT display, an encoder knob and an SD card. Copy all files from the SD-CARD-Content folder to your SD card. You can add your own music files. There is some information about that in the source files, how their names should be formattted.
 
@@ -35,6 +36,10 @@ The main file is Sonos_Controller_ESP32-V3-ASYNC.ino and also tells which I/O pi
 
 This is a work in progress. It is quite a mess really and needs fixes in many places.
 Provided as is.  
+
+Youtube:
+  * Jukebox - https://www.youtube.com/watch?v=mL4axSTkN0s
+  * Led Marix - https://www.youtube.com/watch?v=HMJUrEQusU4
 
 Enjoy!
 
