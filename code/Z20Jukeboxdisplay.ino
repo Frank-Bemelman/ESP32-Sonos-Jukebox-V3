@@ -120,6 +120,11 @@ void TFT_line_print(int line, const char *content)
   }
 
   strcpy(MyDisplay[line].content, extAscii);
+  if(FollowTFTLine==line && strlen(MyDisplay[line].content)>0)
+  { strcpy(newMessage, MyDisplay[line].content);
+    strcat(newMessage, " --- "); // add --- looks nicer on the led matrix display
+    newMessageAvailable = true;
+  }
 
   MyDisplay[line].refresh = true;
   MyDisplay[line].backgroundcolor = TFT_DARKGREY;
@@ -139,6 +144,7 @@ void TFT_line_print(int line, const char *content)
   else
   { MyDisplay[line].scroll = false;
   }
+
 
   MyDisplay[line].scrollpos = 0;
   MyDisplay[line].scrolldelay = 200; // delayed start of scolling (not implemented)
@@ -346,6 +352,9 @@ void UpdateLCD2(void)
 //  Serial.print(currentMillis);Serial.println("uS entry");
 
 //   Serial.print(ShowVolume10mS);Serial.println("-ShowVolume10mS");
+
+
+
 
   // refresh display is true after timer has run out for a special display 
   refreshdisplay = UpdateLCDpotentiometer(ShowVolume10mS);

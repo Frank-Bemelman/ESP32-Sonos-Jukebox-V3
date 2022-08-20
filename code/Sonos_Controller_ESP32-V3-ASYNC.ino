@@ -70,15 +70,15 @@ int DeviceMode = SELECTRADIO;
 //   D33 ENCODER B
 //   D25 ENCODER A
 //   D26 SD_MISO
-//   D27 
+//   D27 (GPIO27) LEDMATRIX MAX7219 CLK
 //   D14 SD_SCLK
-//   D12
+//   D12 (GPIO12) LEDMATRIX MAX7219 DATA
 //   D13 SD_MOSI
 //   GND
 //   VIN
 // Right row
 //   D23 (GPION23) TFT MOSI (VSPI)
-//   D22 (GPIO22)
+//   D22 (GPIO22)  LEDMATRIX MAX7219 CS
 //   TXO (GPIO1)
 //   RXO (GPIO3)
 //   D21 (GPIO21) SOLENOID
@@ -96,6 +96,33 @@ int DeviceMode = SELECTRADIO;
 
 #include <SD.h> 
 //#include "FS.h"
+
+#include <MD_Parola.h>
+#include <MD_MAX72xx.h>
+#define HARDWARE_TYPE MD_MAX72XX::DR1CR0RR0_HW ///< Structured name equivalent to FC16_HW
+#define MAX_DEVICES 11 // 25
+#define CLK_PIN_MAX2719 27 // 14
+#define DATA_PIN_MAX2719 12  // 13
+#define CS_PIN    22
+uint8_t scrollSpeed = 60; //10;//25;    // default frame delay value
+textEffect_t scrollEffect = PA_SCROLL_LEFT;
+textPosition_t scrollAlign = PA_RIGHT;
+uint16_t scrollPause = 0; // 2000; // in milliseconds
+// Global message buffers shared by Serial and Scrolling functions
+#define  BUF_SIZE  150 // 75
+char curMessage[BUF_SIZE] = { "BOOTING --- " };
+char newMessage[BUF_SIZE] = { "" };
+bool newMessageAvailable = false;
+int FollowTFTLine = 0;
+
+
+
+// HARDWARE SPI
+//MD_Parola P = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
+// SOFT SPI
+//MD_Parola P = MD_Parola(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES);
+MD_Parola P = MD_Parola(HARDWARE_TYPE, DATA_PIN_MAX2719, CLK_PIN_MAX2719, CS_PIN, MAX_DEVICES);
+
 #include <SPI.h>
 SPIClass sdSPI(HSPI);
 bool   SD_present = false;
@@ -103,6 +130,12 @@ bool   SD_present = false;
 #define SD_MOSI 13
 #define SD_SCLK 14
 #define SD_CS 15
+
+//#include "LedMatrix.h" // https://github.com/squix78/MAX7219LedMatrix 
+// ledmatrix DIN = GPIO13
+// ledmatrix CLK = GPIO14
+//LedMatrix ledMatrix = LedMatrix(2, 22); // number of modules, CS pin
+
 
 const char KnobDecals[]="ABCDEFGHJK1234567890";
 
@@ -468,7 +501,7 @@ void IRAM_ATTR onTimer() {
   if(ShowArt10mS)ShowArt10mS--;
   if(UpdateTimeOut10mS)UpdateTimeOut10mS--;  
 
-  if((interruptCounter % 5)==0)ScrollNow = true; // ticker for the vertical scrolling
+  if((interruptCounter % 5)==0)ScrollNow = true; // 50ms ticker for the vertical scrolling
 
   if((interruptCounter % 10)==0)
   { bUpdateDisplay = true; // display refresh max 10 times a second
@@ -565,6 +598,8 @@ AsyncStaticWebHandler* handler;
 
 void setup()
 { int ret;
+  
+  
   // read settings 
   EEPROM.begin(EEPROM_SIZE);
   NewRadioStation = EEPROM.read(EEPROM_RADIOSTATION);
@@ -587,7 +622,30 @@ void setup()
         leds[i].setRGB(0, 0, 255);
   }        
   FastLED.show();
- 
+
+   pinMode(19,INPUT_PULLUP);
+  Serial.print(F("Initializing SD card...")); 
+  pinMode(SD_MISO,INPUT_PULLUP);
+  pinMode(SD_MOSI,INPUT_PULLUP);
+
+  sdSPI.begin(SD_SCLK, SD_MISO, SD_MOSI, SD_CS);
+  if (!SD.begin(SD_CS, sdSPI))
+  {  
+    Serial.println(F("Card failed or not present, no SD Card data logging possible..."));
+    SD_present = false; 
+  } 
+  else
+  {
+    Serial.println(F("Card initialised... file access enabled..."));
+    SD_present = true; 
+  }
+
+  P.begin();
+  P.setIntensity(1);
+  P.displayText(curMessage, scrollAlign, scrollSpeed, scrollPause, scrollEffect, scrollEffect);
+  P.setScrollSpacing(1);
+
+  
   // timer for led strip timing en magneet timing
   timer = timerBegin(0, 80, true); // prescaler 1MHz
   timerAttachInterrupt(timer, &onTimer, true);
@@ -658,30 +716,17 @@ xTaskCreatePinnedToCore(
 
   TFT_line_print(0, "SETUP");
   TFT_line_print(1, "SD CARD");
-  pinMode(19,INPUT_PULLUP);
-  Serial.print(F("Initializing SD card...")); 
-  pinMode(SD_MISO,INPUT_PULLUP);
-  pinMode(SD_MOSI,INPUT_PULLUP);
 
-  sdSPI.begin(SD_SCLK, SD_MISO, SD_MOSI, SD_CS);
-  if (!SD.begin(SD_CS, sdSPI))
-  {  
-    Serial.println(F("Card failed or not present, no SD Card data logging possible..."));
-    SD_present = false; 
-  } 
-  else
-  {
-    Serial.println(F("Card initialised... file access enabled..."));
-    SD_present = true; 
-  }
-  delay(2000);
+  delay(1000);
   if(SD_present == true)TFT_line_print(1, "SD CARD OK");
   else TFT_line_print(1, "NO SD CARD");
-  delay(2000);
-  
+  delay(1000);
+
+ 
   
   TFT_line_print(0, "WIFI SETUP");
   TFT_line_print(1, "");
+  delay(1000);
   
   setup2();
   
@@ -715,6 +760,7 @@ xTaskCreatePinnedToCore(
   Serial.println("Starting Webserver ...");
   server->begin();
 
+  FollowTFTLine = 0;
   TFT_line_print(0, "SERVICES");
   TFT_line_print(1, "WebServer");
   char text[32];
@@ -779,6 +825,8 @@ xTaskCreatePinnedToCore(
 //  Serial.println();
   
   Serial.println("Setup done.");
+
+
 }
 
 
@@ -804,6 +852,9 @@ int n;
 //  currentMillis = millis();  
 //  Serial.println(currentMillis); 
 
+
+
+
   if(BootFase) // after setup, BootFase == 1
   { if(UpdateTimeOut10mS == 0)
     {  Serial.print("Bootfase=");Serial.println(BootFase);
@@ -824,6 +875,7 @@ int n;
           TFT_line_print(2, "");
           TFT_line_print(3, "");
           TFT_line_print(4, "");
+          FollowTFTLine = 5;
           if(DeviceMode==0)TFT_line_print(5, "JUKEBOX");
           else if(DeviceMode==1)TFT_line_print(5, "WALLBOX");
           else TFT_line_print(5, "ESP32");
@@ -936,7 +988,10 @@ int n;
           TFT_line_print(2, "MODE");
           TFT_line_print(3, "");
           TFT_line_print(4, "");
+          FollowTFTLine = 5;
           TFT_line_print(5, "RETRIEVING SONOS MODUS OPERANDI");
+//          strcpy(newMessage,"RETRIEVING SONOS MODUS OPERANDI --- ");
+//          newMessageAvailable = true;
           runAsyncClient(SONOSGETMODE);
           BootFase++;
           UpdateTimeOut10mS = 500;
@@ -979,6 +1034,8 @@ int n;
           break;
         case 20: // 
           TFT_line_print(5, "LOADING PLAYLIST TRACKS FROM SONOS");
+//          strcpy(newMessage,"LOADING PLAYLIST TRACKS FROM SONOS --- ");
+//          newMessageAvailable = true;
           // try to load a list of songs from playlist 'Jukebox'on Sonos
           // 101 for a full playlist including the notification tune for to use for empty slots
           songcount = G_Sonos.getSonosPlayLists2(ACTIVE_sonosIP); // 101 if full playlist plus AALEEG.MP3
@@ -1016,6 +1073,7 @@ int n;
             if(songcount>100)songcount=100;
           }
 
+          FollowTFTLine = 1;
           TFT_line_print(1, "LOADING DONE");
           BootFase++;
           UpdateTimeOut10mS = 200;
@@ -2017,10 +2075,18 @@ void UnRavelDidl(char *didl)
   }
 
   if(DeviceMode == SELECTRADIO)
-  { if(*tagcontent4)TFT_line_print(1, tagcontent4); // radio stream, not the title here
+  { if(*tagcontent4)
+    { TFT_line_print(1, tagcontent4); // radio stream, not the title here
+      strcpy(newMessage,tagcontent4);
+      strcat(newMessage, " --- ");
+      newMessageAvailable = true;
+    }
   }
   else
   {  TFT_line_print(1, tagcontent1); // song title
+     strcpy(newMessage,tagcontent1);
+     strcat(newMessage, " --- ");
+     newMessageAvailable = true;
      TFT_line_print(2, tagcontent2); // artist
      TFT_line_print(3, tagcontent3); // album
   }  

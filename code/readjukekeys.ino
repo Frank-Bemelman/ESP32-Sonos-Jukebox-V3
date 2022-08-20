@@ -121,6 +121,17 @@ void ReadJukeKeys(void * pvParameters)
     act_blue_button = digitalRead(BLUE_BUTTON);
     act_encoder_button = digitalRead(ENCODER_BUTTON);
 
+
+if (P.displayAnimate())
+  {
+    if (newMessageAvailable)
+    {
+      strcpy(curMessage, newMessage);
+      newMessageAvailable = false;
+    }
+    P.displayReset();
+  }
+
    
     if(DeviceType == WALLBOX)
     { if(act_control_key == 1) // skip button also used to switch between radio/jukebox when pressed long
